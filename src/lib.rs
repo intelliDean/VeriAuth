@@ -35,11 +35,6 @@ sol_storage! {
     #[entrypoint]
     pub struct Authenticity {
         address owner;
-        bytes32 certificate_type_hash;
-        bytes32 eip712_domain_type_hash;
-
-        string signing_domain;
-        string signature_version;
         address ownership;
 
         mapping(address => string) manufacturers;
