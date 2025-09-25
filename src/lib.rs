@@ -92,7 +92,7 @@ impl Authenticity {
         manu_addr: Address,
         manu_name: String,
     ) -> Result<(), EriError> {
-        self.only_owner(self.vm().msg_sender())?;
+        // self.only_owner(self.vm().msg_sender())?;
         self.address_zero_check(manu_addr)?;
 
         if !self.manufacturers.getter(manu_addr).is_empty() {
