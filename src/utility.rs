@@ -12,13 +12,15 @@ sol! {
     error CLAIM_FAILED();
     error INVALID_SIGNATURE();
     error EC_RECOVER_CALL_ERROR();
-    error DOES_NOT_EXIST();
+    error DOES_NOT_EXIST(address user);
     error ONLY_OWNER(address user);
     error UNAUTHORISED(address retailer);
+    error ALREADY_AUTHORIZED(address retailer);
 
 
     event ManufacturerRegistered(address indexed manufacturerAddress, string indexed manufacturerName);
     event ContractCreated(address indexed contractAddress, address indexed owner);
+    event AuthorizedRetailerAdded(address indexed manufacturer, address indexed retailer);
 }
 
 #[derive(SolidityError)]
@@ -26,7 +28,7 @@ pub enum EriError {
 
     AddressZero(ADDRESS_ZERO),
     NotRegistered(NOT_REGISTERED),
-    Registered(ALREADY_REGISTERED),
+    AlreadyRegistered(ALREADY_REGISTERED),
     InvalidManufacturerName(INVALID_MANUFACTURER_NAME),
     NameNotAvailable(NAME_NOT_AVAILABLE),
     ClaimFailed(CLAIM_FAILED),
@@ -34,6 +36,8 @@ pub enum EriError {
     ECRecoverError(EC_RECOVER_CALL_ERROR),
     DoesNotExist(DOES_NOT_EXIST),
     OnlyOwner(ONLY_OWNER),
-    UnauthorisedRetailer(UNAUTHORISED)
+    UnauthorisedRetailer(UNAUTHORISED),
+    AlreadyAuthorized(ALREADY_AUTHORIZED)
 }
+
 

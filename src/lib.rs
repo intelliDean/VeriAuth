@@ -9,36 +9,20 @@ mod verify_signature;
 
 use crate::utility::{EriError::*, *};
 use crate::verify_signature::verify;
-use alloc::string::String;
+use alloc::string::{String, ToString};
 use alloc::vec::Vec;
-use alloy_primitives::{address, Address, FixedBytes};
+use alloy_primitives::{address, keccak256, Address, FixedBytes};
 use core::convert::Into;
 use stylus_sdk::abi::Bytes;
 use stylus_sdk::{alloy_primitives::U256, evm, prelude::*};
-
-sol_interface! {
-    interface IEri {
-         function createItem(
-            address user,
-            string calldata name,
-            string calldata unique_id,
-            string calldata serial,
-            uint256 date,
-            address owner,
-            string[] memory metadata,
-            string calldata manufacturer_name
-        ) external;
-    }
-}
 
 sol_storage! {
     #[entrypoint]
     pub struct Authenticity {
         address owner;
-        address ownership;
 
         mapping(address => string) manufacturers;
-        mapping(string => address) names;
+        mapping(bytes32 => address) names;
         mapping(address => address[]) authorised_retailers;
     }
 }
@@ -64,42 +48,40 @@ impl Authenticity {
         }
         Ok(())
     }
+
     fn is_manufacturer(&self, address: Address) -> Result<bool, EriError> {
         Ok(!self.manufacturers.getter(address).is_empty())
     }
 
-    // fn is_an_authorised_retailer(
-    //     &self,
-    //     manufacturer: Address,
-    //     retailer: Address,
-    // ) -> Result<bool, EriError> {
-    //     let retailers = self.authorised_retailers.getter(manufacturer);
-    //
-    //     let mut is_part = false;
-    //
-    //     for i in 0..retailers.len() {
-    //         let each_retailer = retailers.getter(i).unwrap().get();
-    //
-    //         if each_retailer == retailer {
-    //             is_part = true;
-    //             break;
-    //         }
-    //     }
-    //
-    //     Ok(is_part)
-    // }
+    pub fn is_an_authorised_retailer(
+        &self,
+        manufacturer: Address,
+        retailer: Address,
+    ) -> Result<bool, EriError> {
+        let retailers = self.authorised_retailers.getter(manufacturer);
+        for i in 0..retailers.len() {
+            match retailers.get(i) {
+                Some(each_retailer) if each_retailer == retailer => return Ok(true),
+                _ => continue,
+            }
+        }
+
+        Ok(false)
+    }
 }
 
 #[public]
 impl Authenticity {
     #[constructor]
-    pub fn constructor(&mut self, ownership_addr: Address) -> Result<(), EriError> {
-        self.ownership.set(ownership_addr);
-        self.owner.set(self.vm().msg_sender());
+    pub fn constructor(&mut self) -> Result<(), EriError> {
+        let caller = self.vm().tx_origin();
+        // Initialize storage
+        self.owner.set(caller);
 
+        // Emit event
         evm::log(ContractCreated {
             contractAddress: self.vm().contract_address(),
-            owner: self.vm().tx_origin(),
+            owner: caller,
         });
 
         Ok(())
@@ -111,56 +93,76 @@ impl Authenticity {
         manu_name: String,
     ) -> Result<(), EriError> {
         self.only_owner(self.vm().msg_sender())?;
-
         self.address_zero_check(manu_addr)?;
-        self.is_registered(manu_addr)?;
 
-        if manu_name.len() < 3 {
-            //to make sure the name is longer than 2 letters
-            return Err(InvalidManufacturerName(INVALID_MANUFACTURER_NAME {
-                name: manu_name.clone(),
-            }));
+        if !self.manufacturers.getter(manu_addr).is_empty() {
+            return Err(AlreadyRegistered(ALREADY_REGISTERED { user: manu_addr }));
         }
 
-        if !self.names.get(manu_name.clone()).is_empty() {
-            //to make sure name is unique
+        let trimmed_name = manu_name.trim();
+        if trimmed_name.len() < 3 || trimmed_name.len() > 100 {
+            return Err(InvalidManufacturerName(
+                INVALID_MANUFACTURER_NAME {
+                    name: trimmed_name.to_string(),
+                },
+            ));
+        }
+        //====
+
+        let name_hash = keccak256(trimmed_name.as_bytes());
+        if !self.names.get(name_hash).is_empty() {
             return Err(NameNotAvailable(NAME_NOT_AVAILABLE {
-                name: manu_name.clone(),
+                name: trimmed_name.to_string(),
             }));
         }
+        self.manufacturers.setter(manu_addr).set_str(trimmed_name.to_uppercase());
+        self.names.setter(name_hash).set(manu_addr);
 
-        //save name against address
-        self.manufacturers.setter(manu_addr).set_str(&manu_name);
-        //save address against name
-        self.names.setter(manu_name.clone()).set(manu_addr);
-
+        // Emit event
         evm::log(ManufacturerRegistered {
             manufacturerAddress: manu_addr,
-            manufacturerName: manu_name.parse().unwrap(),
+            manufacturerName: trimmed_name.parse().unwrap(),
         });
 
         Ok(())
     }
 
-    fn set_authorised_retailers(&mut self, retailer: Address) -> Result<(), EriError> {
+    pub fn set_authorised_retailers(&mut self, retailer: Address) -> Result<(), EriError> {
         let caller = self.vm().msg_sender();
 
         self.is_registered(caller)?;
         self.address_zero_check(retailer)?;
 
-        let mut retailers = self.authorised_retailers.setter(caller);
+        let retailers = self.authorised_retailers.getter(caller);
 
+        for i in 0..retailers.len() {
+            if retailers.get(i).unwrap() == retailer {
+                return Err(EriError::AlreadyAuthorized(ALREADY_AUTHORIZED { retailer }));
+            }
+        }
+
+        let mut retailers = self.authorised_retailers.setter(caller);
         retailers.push(retailer);
+
+        evm::log(AuthorizedRetailerAdded {
+            manufacturer: caller,
+            retailer,
+        });
 
         Ok(())
     }
 
-    fn get_manufacturer(&self, address: Address) -> Result<String, EriError> {
-        if self.manufacturers.getter(address).is_empty() {
-            return Err(DoesNotExist(DOES_NOT_EXIST {}));
+    pub fn get_manufacturer(&self, address: Address) -> Result<String, EriError> {
+        self.address_zero_check(address)?;
+
+        // cache storage read
+        let manufacturer_name = self.manufacturers.getter(address);
+
+        if manufacturer_name.is_empty() {
+            return Err(DoesNotExist(DOES_NOT_EXIST { user: address }));
         }
 
-        Ok(self.manufacturers.getter(address).get_string())
+        Ok(manufacturer_name.get_string())
     }
 
     fn verify_signature(
@@ -174,7 +176,7 @@ impl Authenticity {
         signature: Bytes,
     ) -> Result<bool, EriError> {
         if !self.is_manufacturer(owner)? {
-            return Err(DoesNotExist(DOES_NOT_EXIST {}));
+            return Err(DoesNotExist(DOES_NOT_EXIST { user: owner }));
         }
 
         Ok(verify(
@@ -262,6 +264,7 @@ impl Authenticity {
         }
     }
 }
+// 0xc878f5a90e707611de3ab5a2fec9c6fda3095695
 
 // #[cfg(test)]
 // mod test {
@@ -289,4 +292,4 @@ impl Authenticity {
 //     }
 // }
 //
-// deployed code at address: 0xc76493af47eb5738c93567373c8f7e305c390755
+// deployed code at address: 0xa87b9fe758c15dc79b517cde837df41e70af7d0a
