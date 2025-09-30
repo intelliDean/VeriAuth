@@ -9,12 +9,11 @@ mod verify_signature;
 
 use crate::utility::{EriError::*, *};
 use crate::verify_signature::verify;
-use alloc::string::{String, ToString};
+use alloc::string::{String};
 use alloc::vec::Vec;
-use alloy_primitives::{address, keccak256,U256, Address, FixedBytes};
-use core::convert::Into;
+use alloy_primitives::{address, keccak256, Address, FixedBytes, U256};
 use stylus_sdk::abi::Bytes;
-use stylus_sdk::{ evm, prelude::*};
+use stylus_sdk::{evm, prelude::*};
 
 sol_storage! {
     #[entrypoint]
@@ -33,7 +32,6 @@ impl Authenticity {
         Ok(())
     }
 
-
     fn is_manufacturer(&self, address: Address) -> Result<bool, EriError> {
         Ok(!self.manufacturers.getter(address).is_empty())
     }
@@ -41,7 +39,6 @@ impl Authenticity {
 
 #[public]
 impl Authenticity {
-
     pub fn manufacturer_registers(
         &mut self,
         manu_addr: Address,
@@ -51,9 +48,10 @@ impl Authenticity {
 
         let name_hash = keccak256(manu_name.as_bytes());
 
-        self.manufacturers.setter(manu_addr).set_str(manu_name.clone());
+        self.manufacturers
+            .setter(manu_addr)
+            .set_str(manu_name.clone());
         self.names.setter(name_hash).set(manu_addr);
-
 
         Ok(())
     }
@@ -94,29 +92,5 @@ impl Authenticity {
             metadata_hash,
             signature,
         )?)
-    }
-
-    fn verify_authenticity(
-        &self,
-        name: String,
-        unique_id: String,
-        serial: String,
-        date: U256,
-        owner: Address,
-        metadata_hash: FixedBytes<32>,
-        signature: Bytes,
-    ) -> Result<(bool, String), EriError> {
-        match self.verify_signature(
-            name.clone(),
-            unique_id.clone(),
-            serial.clone(),
-            date,
-            owner,
-            metadata_hash,
-            signature,
-        ) {
-            Ok(is_valid) => Ok((is_valid, self.manufacturers.get(owner).get_string())),
-            Err(_) => Err(InvalidSignature(INVALID_SIGNATURE {})),
-        }
     }
 }
