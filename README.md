@@ -2,7 +2,7 @@
 
 ## Overview
 
-A blockchain-based solution for product authenticity verification using Stylus SDK. The system enables manufacturers to register their products, authorize retailers, and verify product authenticity through digital signatures.
+A blockchain-based solution for product authenticity verification using Stylus SDK. The system enables manufacturers to register their products on-chain through EIP-712 digital signature, and verify product authenticity through QR code.
 
 ## Architecture
 
@@ -12,7 +12,6 @@ A blockchain-based solution for product authenticity verification using Stylus S
 - **Location**: `src/lib.rs`
 - **Key Components**:
   - Manufacturer Registration
-  - Retailer Authorization
   - Signature Verification
   - Owner Management
 
@@ -36,12 +35,6 @@ Authenticity/
 - Manage authorized retailers
 - Issue product authenticity signatures
 
-### For Retailers
-
-- Connect wallet for authentication
-- Verify product authenticity
-- Register product ownership
-
 ### Security Features
 
 - Address validation
@@ -55,8 +48,6 @@ Authenticity/
 
 - Rust
 - Stylus SDK
-- WASM compatibility
-- No standard library (`no_std`)
 
 ### Dependencies
 
@@ -80,14 +71,20 @@ sudo apt install nodejs npm
 ### Building the Contract
 
 ```bash
-cargo build --release
+git clone https://github.com/intelliDean/VeriAuth.git
 ```
 
-### Running Tests
+### Generate the solidity interface like
 
 ```bash
-cargo test
+cargo stylus export-abi
 ```
+
+### Check your smart contract
+
+```bash
+ cargo stylus check
+ ```
 
 ### Deploying the Contract
 
@@ -149,6 +146,12 @@ The project includes comprehensive tests covering:
 ## Contact
 
 For questions and support, please open an issue in the repository.
+
+## Built by...
+
+1. Michael Dean
+2. Ebuka Moses
+3. Sunday Solomon
 
 ---
 
