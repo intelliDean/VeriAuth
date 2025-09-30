@@ -874,8 +874,8 @@ const AUTHENTICITY_ABI = [
   },
 ];
 
-// const AUTHENTICITY_ADDRESS = process.env.NEXT_PUBLIC_AUTHENTICITY;
-const AUTHENTICITY_ADDRESS = "0xfbb18f0732eb2459b08e03f7d1d85c89f0776426";
+const AUTHENTICITY_ADDRESS = process.env.NEXT_PUBLIC_AUTHENTICITY;
+// const AUTHENTICITY_ADDRESS = "0xfbb18f0732eb2459b08e03f7d1d85c89f0776426";
 
 // Typed data structure for EIP-712 signing
 // const signTypedData = (cert, chainId) => {
@@ -1165,11 +1165,19 @@ export default function Authenticity() {
         ),
       };
 
+      // JSON.stringify(cert, null, 2);
+      console.log("cert: ", cert);
+
       const { domain, types, value } = signTypedData(
         cert,
         (await provider.getNetwork()).chainId
       );
+
+      console.log("Signing typed data:", { domain, types, value });
+
       const signature = await signer.signTypedData(domain, types, value);
+
+      console.log("Signature:", signature);
 
       // Verify signature locally first
       const recoveredAddress = ethers.verifyTypedData(
@@ -1181,6 +1189,8 @@ export default function Authenticity() {
       if (recoveredAddress.toLowerCase() !== owner.toLowerCase()) {
         throw new Error("Frontend signature verification failed");
       }
+
+      console.log("Recovered address:", recoveredAddress);
 
       toast.info("Frontend signature verification passed");
 
@@ -1194,6 +1204,8 @@ export default function Authenticity() {
         cert.metadataHash,
         signature
       );
+
+      console.log("Contract verification result:", isValid);
 
       setSignatureResult(`Signature valid: ${isValid}`);
       setSignature(signature);
@@ -1564,54 +1576,86 @@ export default function Authenticity() {
                       <h3 className="text-lg font-semibold text-gray-700">
                         Certificate Details
                       </h3>
-                      <input
-                        type="text"
-                        placeholder="Product Name"
-                        value={certificate.name}
-                        onChange={(e) =>
-                          setCertificate({
-                            ...certificate,
-                            name: e.target.value,
-                          })
-                        }
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200"
-                      />
-                      <input
-                        type="text"
-                        placeholder="Unique ID"
-                        value={certificate.uniqueId}
-                        onChange={(e) =>
-                          setCertificate({
-                            ...certificate,
-                            uniqueId: e.target.value,
-                          })
-                        }
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200"
-                      />
-                      <input
-                        type="text"
-                        placeholder="Serial Number"
-                        value={certificate.serial}
-                        onChange={(e) =>
-                          setCertificate({
-                            ...certificate,
-                            serial: e.target.value,
-                          })
-                        }
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200"
-                      />
-                      <input
-                        type="text"
-                        placeholder="Metadata (comma-separated)"
-                        value={certificate.metadata}
-                        onChange={(e) =>
-                          setCertificate({
-                            ...certificate,
-                            metadata: e.target.value,
-                          })
-                        }
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200"
-                      />
+
+                      {/* Product Name */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Product Name
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="e.g., iPhone 15 Pro"
+                          value={certificate.name}
+                          onChange={(e) =>
+                            setCertificate({
+                              ...certificate,
+                              name: e.target.value,
+                            })
+                          }
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 text-gray-900 bg-white"
+                        />
+                      </div>
+
+                      {/* Unique ID - ADDED THIS MISSING FIELD */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Unique ID
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="e.g., IMEI123456789"
+                          value={certificate.uniqueId}
+                          onChange={(e) =>
+                            setCertificate({
+                              ...certificate,
+                              uniqueId: e.target.value,
+                            })
+                          }
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 text-gray-900 bg-white"
+                        />
+                      </div>
+
+                      {/* Serial Number */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Serial Number
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="e.g., SN123456789"
+                          value={certificate.serial}
+                          onChange={(e) =>
+                            setCertificate({
+                              ...certificate,
+                              serial: e.target.value,
+                            })
+                          }
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 text-gray-900 bg-white"
+                        />
+                      </div>
+
+                      {/* Metadata */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Metadata
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="e.g., Black, 256GB, 5G"
+                          value={certificate.metadata}
+                          onChange={(e) =>
+                            setCertificate({
+                              ...certificate,
+                              metadata: e.target.value,
+                            })
+                          }
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 text-gray-900 bg-white"
+                        />
+                        <p className="mt-1 text-sm text-gray-500">
+                          Enter comma-separated attributes
+                        </p>
+                      </div>
+
                       <button
                         onClick={handleVerifySignature}
                         disabled={
@@ -1692,85 +1736,135 @@ export default function Authenticity() {
                       <h3 className="text-lg font-semibold text-gray-700">
                         Certificate Details
                       </h3>
-                      <input
-                        type="text"
-                        placeholder="Product Name"
-                        value={certificate.name}
-                        onChange={(e) =>
-                          setCertificate({
-                            ...certificate,
-                            name: e.target.value,
-                          })
-                        }
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
-                      />
-                      <input
-                        type="text"
-                        placeholder="Unique ID"
-                        value={certificate.uniqueId}
-                        onChange={(e) =>
-                          setCertificate({
-                            ...certificate,
-                            uniqueId: e.target.value,
-                          })
-                        }
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
-                      />
-                      <input
-                        type="text"
-                        placeholder="Serial Number"
-                        value={certificate.serial}
-                        onChange={(e) =>
-                          setCertificate({
-                            ...certificate,
-                            serial: e.target.value,
-                          })
-                        }
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
-                      />
-                      <input
-                        type="number"
-                        placeholder="Date (Unix timestamp)"
-                        value={certificate.date}
-                        onChange={(e) =>
-                          setCertificate({
-                            ...certificate,
-                            date: e.target.value,
-                          })
-                        }
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
-                      />
-                      <input
-                        type="text"
-                        placeholder="Owner Address (0x...)"
-                        value={certificate.owner}
-                        onChange={(e) =>
-                          setCertificate({
-                            ...certificate,
-                            owner: e.target.value,
-                          })
-                        }
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 font-mono"
-                      />
-                      <input
-                        type="text"
-                        placeholder="Metadata (comma-separated)"
-                        value={certificate.metadata}
-                        onChange={(e) =>
-                          setCertificate({
-                            ...certificate,
-                            metadata: e.target.value,
-                          })
-                        }
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200"
-                      />
-                      <input
-                        type="text"
-                        placeholder="Signature (0x...)"
-                        value={veriSignature}
-                        onChange={(e) => setVeriSignature(e.target.value)}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 font-mono"
-                      />
+
+                      {/* Product Name */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Product Name
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="Product Name"
+                          value={certificate.name}
+                          onChange={(e) =>
+                            setCertificate({
+                              ...certificate,
+                              name: e.target.value,
+                            })
+                          }
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 text-gray-900 bg-white"
+                        />
+                      </div>
+
+                      {/* Unique ID */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Unique ID
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="Unique ID"
+                          value={certificate.uniqueId}
+                          onChange={(e) =>
+                            setCertificate({
+                              ...certificate,
+                              uniqueId: e.target.value,
+                            })
+                          }
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 text-gray-900 bg-white"
+                        />
+                      </div>
+
+                      {/* Serial Number */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Serial Number
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="Serial Number"
+                          value={certificate.serial}
+                          onChange={(e) =>
+                            setCertificate({
+                              ...certificate,
+                              serial: e.target.value,
+                            })
+                          }
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 text-gray-900 bg-white"
+                        />
+                      </div>
+
+                      {/* Date */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Date (Unix timestamp)
+                        </label>
+                        <input
+                          type="number"
+                          placeholder="Date (Unix timestamp)"
+                          value={certificate.date}
+                          onChange={(e) =>
+                            setCertificate({
+                              ...certificate,
+                              date: e.target.value,
+                            })
+                          }
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 text-gray-900 bg-white"
+                        />
+                      </div>
+
+                      {/* Owner Address */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Owner Address
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="Owner Address (0x...)"
+                          value={certificate.owner}
+                          onChange={(e) =>
+                            setCertificate({
+                              ...certificate,
+                              owner: e.target.value,
+                            })
+                          }
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 text-gray-900 bg-white font-mono"
+                        />
+                      </div>
+
+                      {/* Metadata */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Metadata
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="Metadata (comma-separated)"
+                          value={certificate.metadata}
+                          onChange={(e) =>
+                            setCertificate({
+                              ...certificate,
+                              metadata: e.target.value,
+                            })
+                          }
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 text-gray-900 bg-white"
+                        />
+                      </div>
+
+                      {/* Signature */}
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Signature
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="Signature (0x...)"
+                          value={veriSignature}
+                          onChange={(e) => setVeriSignature(e.target.value)}
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 text-gray-900 bg-white font-mono"
+                        />
+                      </div>
+
                       <button
                         onClick={handleVerifyAuthenticity}
                         disabled={
@@ -1796,6 +1890,7 @@ export default function Authenticity() {
                       </button>
                     </div>
 
+                    {/* Results section remains the same */}
                     <div className="space-y-4">
                       <h3 className="text-lg font-semibold text-gray-700">
                         Verification Result
