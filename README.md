@@ -133,6 +133,12 @@ The project includes comprehensive tests covering:
 - Name length validation (3-100 characters)
 - Owner-only administrative functions
 
+## Contract Link on Arbiscan:
+https://sepolia.arbiscan.io/address/0x40f7d5193d026b5d270a28ed171e541a387cf56b
+
+## Contract Frontend
+https://veri-auth-swart.vercel.app/
+
 ## License
 
 [MIT License](LICENSE)
