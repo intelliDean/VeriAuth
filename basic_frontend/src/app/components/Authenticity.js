@@ -8,9 +8,7 @@ import { QRCodeCanvas } from "qrcode.react";
 import { parseError } from "../resources/error.js";
 import { AUTHENTICITY_ABI } from "../resources/authenticity_abi.js";
 
-
 const AUTHENTICITY_ADDRESS = process.env.NEXT_PUBLIC_AUTHENTICITY;
-
 
 export default function Authenticity() {
   const [loading, setLoading] = useState(false);
@@ -437,7 +435,6 @@ export default function Authenticity() {
         signature
       );
 
-
       console.log("result: ", isValid);
 
       if (isValid) {
@@ -536,6 +533,7 @@ export default function Authenticity() {
     }
   }, []);
 
+ 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8 px-4">
       <div className="max-w-6xl mx-auto bg-white rounded-2xl shadow-2xl overflow-hidden">
@@ -640,7 +638,7 @@ export default function Authenticity() {
                             setManufacturerAddress(e.target.value)
                           }
                           placeholder="0x..."
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 font-mono"
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 font-mono text-gray-800 bg-white"
                         />
                         <button
                           onClick={() => setManufacturerAddress(account)}
@@ -658,7 +656,7 @@ export default function Authenticity() {
                           value={manufacturerName}
                           onChange={(e) => setManufacturerName(e.target.value)}
                           placeholder="Enter manufacturer name (3-100 characters)"
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-gray-800 bg-white"
                         />
                         <p className="mt-1 text-sm text-gray-500">
                           {manufacturerName.length}/100 characters
@@ -701,7 +699,7 @@ export default function Authenticity() {
                           value={queryAddress}
                           onChange={(e) => setQueryAddress(e.target.value)}
                           placeholder="0x..."
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 font-mono"
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200 font-mono text-gray-800 bg-white"
                         />
                       </div>
                       <button
@@ -759,7 +757,7 @@ export default function Authenticity() {
                               name: e.target.value,
                             })
                           }
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 text-gray-900 bg-white"
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 text-gray-800 bg-white"
                         />
                       </div>
 
@@ -778,7 +776,7 @@ export default function Authenticity() {
                               uniqueId: e.target.value,
                             })
                           }
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 text-gray-900 bg-white"
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 text-gray-800 bg-white"
                         />
                       </div>
 
@@ -797,7 +795,7 @@ export default function Authenticity() {
                               serial: e.target.value,
                             })
                           }
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 text-gray-900 bg-white"
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 text-gray-800 bg-white"
                         />
                       </div>
 
@@ -816,7 +814,7 @@ export default function Authenticity() {
                               metadata: e.target.value,
                             })
                           }
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 text-gray-900 bg-white"
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-200 text-gray-800 bg-white"
                         />
                         <p className="mt-1 text-sm text-gray-500">
                           Enter comma-separated attributes
@@ -858,7 +856,7 @@ export default function Authenticity() {
                       )}
                       {signature && (
                         <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg">
-                          <p className="text-sm text-gray-600 break-all">
+                          <p className="text-sm text-gray-800 break-all">
                             Signature: {signature}
                           </p>
                         </div>
@@ -911,7 +909,7 @@ export default function Authenticity() {
                         <textarea
                           placeholder="Paste QR code JSON data here..."
                           onChange={(e) => setQrCodeData(e.target.value)}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 text-gray-900 bg-white font-mono text-sm"
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 text-gray-800 bg-white font-mono text-sm"
                           rows={3}
                         />
                         <button
@@ -937,7 +935,7 @@ export default function Authenticity() {
                               name: e.target.value,
                             })
                           }
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 text-gray-900 bg-white"
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 text-gray-800 bg-white"
                         />
                       </div>
 
@@ -956,7 +954,7 @@ export default function Authenticity() {
                               uniqueId: e.target.value,
                             })
                           }
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 text-gray-900 bg-white"
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 text-gray-800 bg-white"
                         />
                       </div>
 
@@ -975,7 +973,7 @@ export default function Authenticity() {
                               serial: e.target.value,
                             })
                           }
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 text-gray-900 bg-white"
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 text-gray-800 bg-white"
                         />
                       </div>
 
@@ -994,7 +992,7 @@ export default function Authenticity() {
                               date: e.target.value,
                             })
                           }
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 text-gray-900 bg-white"
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 text-gray-800 bg-white"
                         />
                       </div>
 
@@ -1013,7 +1011,7 @@ export default function Authenticity() {
                               owner: e.target.value,
                             })
                           }
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 text-gray-900 bg-white font-mono"
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 text-gray-800 bg-white font-mono"
                         />
                       </div>
 
@@ -1032,7 +1030,7 @@ export default function Authenticity() {
                               metadata: e.target.value,
                             })
                           }
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 text-gray-900 bg-white"
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 text-gray-800 bg-white"
                         />
                       </div>
 
@@ -1046,7 +1044,7 @@ export default function Authenticity() {
                           placeholder="Signature (0x...)"
                           value={veriSignature}
                           onChange={(e) => setVeriSignature(e.target.value)}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 text-gray-900 bg-white font-mono"
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 text-gray-800 bg-white font-mono"
                         />
                       </div>
 
@@ -1075,7 +1073,7 @@ export default function Authenticity() {
                       </button>
                     </div>
 
-                    {/* Results section remains the same */}
+                    {/* Results section - Fixed text colors */}
                     <div className="space-y-4">
                       <h3 className="text-lg font-semibold text-gray-700">
                         Verification Result
@@ -1086,32 +1084,56 @@ export default function Authenticity() {
                             ✅ Authentic Product
                           </h4>
                           <div className="space-y-2 text-sm">
-                            <p>
-                              <strong>Product:</strong> {veriResult.name}
+                            <p className="text-gray-700">
+                              <strong className="text-gray-800">
+                                Product:
+                              </strong>{" "}
+                              {veriResult.name}
                             </p>
-                            <p>
-                              <strong>Unique ID:</strong> {veriResult.uniqueId}
+                            <p className="text-gray-700">
+                              <strong className="text-gray-800">
+                                Unique ID:
+                              </strong>{" "}
+                              {veriResult.uniqueId}
                             </p>
-                            <p>
-                              <strong>Serial:</strong> {veriResult.serial}
+                            <p className="text-gray-700">
+                              <strong className="text-gray-800">Serial:</strong>{" "}
+                              {veriResult.serial}
                             </p>
-                            <p>
-                              <strong>Date:</strong> {veriResult.date}
+                            <p className="text-gray-700">
+                              <strong className="text-gray-800">Date:</strong>{" "}
+                              {veriResult.date}
                             </p>
-                            <p>
-                              <strong>Owner:</strong>{" "}
+                            <p className="text-gray-700">
+                              <strong className="text-gray-800">Owner:</strong>{" "}
                               <span className="font-mono">
                                 {veriResult.owner}
                               </span>
                             </p>
-                            <p>
-                              <strong>Metadata:</strong> {veriResult.metadata}
+                            <p className="text-gray-700">
+                              <strong className="text-gray-800">
+                                Metadata:
+                              </strong>{" "}
+                              {veriResult.metadata}
                             </p>
-                            <p>
-                              <strong>Manufacturer:</strong>{" "}
+                            <p className="text-gray-700">
+                              <strong className="text-gray-800">
+                                Manufacturer:
+                              </strong>{" "}
                               {veriResult.manufacturer}
                             </p>
                           </div>
+                        </div>
+                      )}
+                      {veriResult === false && (
+                        <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+                          <h4 className="text-lg font-semibold text-red-800 mb-2">
+                            ❌ Product Not Authentic
+                          </h4>
+                          <p className="text-red-700">
+                            This product could not be verified as authentic.
+                            Please check the details and try again.
+                          </p>
                         </div>
                       )}
                     </div>
